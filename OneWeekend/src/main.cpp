@@ -4,18 +4,24 @@
 #include "ray.h"
 #include "vec3.h"
 
-bool hit_sphere(const point3& center, double radius, const ray& r) {
+double hit_sphere(const point3& center, double radius, const ray& r) {
 	vec3 oc = center - r.origin();
-	auto a = dot(r.direction(), r.direction());
-	auto b = -2.0 * dot(r.direction(), oc);
-	auto c = dot(oc, oc) - radius * radius;
-	auto discriminant = b * b - 4 * a * c;
-	return (discriminant >= 0);
+	auto a = r.direction().length_squared();
+	auto h = dot(r.direction(), oc);
+	auto c = oc.length_squared() - radius * radius;
+	auto discriminant = h * h - a * c;
+	if (discriminant < 0) return -1.0;
+	// We'll just assume the closest hit point (smallest t) is the one that we want.
+	return (h - sqrt(discriminant)) / a;
 }
 
 color ray_color(const ray& r) {
-	if (hit_sphere(point3(0, 0, -1), 0.5, r))
-		return color(1, 0, 0);
+	double t = hit_sphere(point3(0, 0, -1), 0.5, r);
+	if (t > 0.0) {
+		vec3 N = unit_vector(r.at(t) - vec3(0, 0, -1));  // normal
+		// each component is between (−1 and 1); map each component to the interval from 0 to 1
+		return 0.5 * color(N.x() + 1, N.y() + 1, N.z() + 1);
+	}
 
 	vec3 unit_direction = unit_vector(r.direction());
 	// This function will linearly blend white and blue depending on the height of the y
