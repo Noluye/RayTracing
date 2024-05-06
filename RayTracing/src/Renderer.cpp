@@ -8,6 +8,8 @@ void Renderer::Render()
 		for (uint32_t x = 0; x < m_FinalImage->GetWidth(); ++x)
 		{
 			glm::vec2 coord = { x / (float)m_FinalImage->GetWidth(), y / (float)m_FinalImage->GetHeight() };
+			// [0, 1] -> [-1, 1]
+			coord = coord * 2.0f - 1.0f;
 			m_ImageData[x + y * m_FinalImage->GetWidth()] = PerPixel(coord);
 		}
 	}
@@ -23,12 +25,19 @@ void Renderer::Render()
 
 uint32_t Renderer::PerPixel(glm::vec2 coord)
 {
-	//result = 0xffff00ff;  // ABGR
-	//result = Walnut::Random::UInt();
-	//result != 0xff000000;
-	uint8_t r = (uint8_t)(coord.x * 255.f);
-	uint8_t g = (uint8_t)(coord.y * 255.f);
-	return 0xff000000 | (g << 8) | r;
+	glm::vec3 rayOrigin(0.0f, 0.0f, 2.0f);
+	glm::vec3 rayDirection(coord.x, coord.y, -1.0f);
+	float radius = 0.5f;
+	// rayDirection = glm::normalize(rayDirection);
+
+	float a = glm::dot(rayDirection, rayDirection);
+	float b = 2.0f * glm::dot(rayOrigin, rayDirection);
+	float c = glm::dot(rayOrigin, rayOrigin) - radius * radius;
+
+	float discriminant = b * b - 4.0f * a * c;
+
+	if (discriminant >= 0.0f) return 0xffff00ff;
+	return 0xff000000;
 }
 
 void Renderer::OnResize(uint32_t width, uint32_t height)
