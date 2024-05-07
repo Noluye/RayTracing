@@ -6,9 +6,13 @@
 
 struct Material
 {
-	glm::vec3 Albedo { 1.0f };
+	glm::vec3 Albedo{ 1.0f };
 	float Roughness = 1.0f;  // 0 means mirror
 	float Metallic = 0.0f;
+	glm::vec3 EmissionColor{ 0.0f };
+	float EmissionPower = 0.0f;
+
+	glm::vec3 GetEmission() const { return EmissionColor * EmissionPower; }
 };
 
 struct Sphere
