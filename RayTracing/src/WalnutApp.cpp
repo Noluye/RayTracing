@@ -66,8 +66,11 @@ public:
 		ImGui::Begin("Settings");
 		ImGui::Text("Last render: %.3fms", m_LastRenderTime);
 		if (ImGui::Button("Render")) Render();
+
 		ImGui::Checkbox("Accumulate", &m_Renderer.GetSettings().Accumulate);
-		if (ImGui::Button("Accumulate")) m_Renderer.ResetFrameIndex();
+		ImGui::Checkbox("Slow Random", &m_Renderer.GetSettings().SlowRandom);
+
+		if (ImGui::Button("Reset")) m_Renderer.ResetFrameIndex();
 		ImGui::End();
 
 		ImGui::Begin("Scene");
@@ -111,7 +114,6 @@ public:
 		}
 		ImGui::End();
 		ImGui::PopStyleVar();
-		//ImGui::ShowDemoWindow();
 
 		Render();
 	}
