@@ -20,12 +20,12 @@ public:
 		pinkSphere.Albedo = { 1.0, 0.0, 1.0 };
 		pinkSphere.Roughness = 0.0f;
 		Material& blueSphere = m_Scene.Materials.emplace_back();
-		blueSphere.Albedo = { 0.2, 0.3, 1.0 };
+		blueSphere.Albedo = { 0.2, 0.3, 1.0 }; 
 		blueSphere.Roughness = 0.1;
 		
 		{
 			Sphere sphere;
-			sphere.Position = { 0.0, 0.0, 0.0 };
+			sphere.Position = { 0.0, 0.0, 0.0 }; 
 			sphere.Radius = 1.0;
 			sphere.MatterialIndex = 0;
 			m_Scene.Spheres.push_back(sphere);
@@ -42,16 +42,18 @@ public:
 
 	virtual void OnUpdate(float ts) override
 	{
-		m_Camera.OnUpdate(ts);
+		if (m_Camera.OnUpdate(ts))
+		{
+			m_Renderer.ResetFrameIndex();
+		}
 	}
 	virtual void OnUIRender() override
 	{
 		ImGui::Begin("Settings");
 		ImGui::Text("Last render: %.3fms", m_LastRenderTime);
-		if (ImGui::Button("Render"))
-		{
-			Render();
-		}
+		if (ImGui::Button("Render")) Render();
+		ImGui::Checkbox("Accumulate", &m_Renderer.GetSettings().Accumulate);
+		if (ImGui::Button("Render")) m_Renderer.ResetFrameIndex();
 		ImGui::End();
 
 		ImGui::Begin("Scene");
